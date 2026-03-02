@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Autenticação - Fórum Engenharia & Manuais</title>
+    <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+
+<div class="auth-container">
+    <div class="auth-box">
+        <h1 class="logo">Fórum Engenharia & Manuais</h1>
+
+        <!-- Login -->
+        <div id="login-area">
+            <h2>Entrar</h2>
+            <form id="login-form">
+                <input type="email" id="login-email" placeholder="Email" required>
+                <input type="password" id="login-senha" placeholder="Senha" required>
+                <button type="submit">Entrar</button>
+            </form>
+            <p class="switch">Não tem conta? <a href="#" id="show-register">Cadastre-se grátis</a></p>
+        </div>
+
+        <!-- Cadastro -->
+        <div id="register-area" style="display:none;">
+            <h2>Criar Conta</h2>
+            <form id="register-form">
+                <input type="text" id="register-nome" placeholder="Nome completo" required>
+                <input type="email" id="register-email" placeholder="Email" required>
+                <input type="password" id="register-senha" placeholder="Senha" required>
+                <button type="submit">Cadastrar</button>
+            </form>
+            <p class="switch">Já tem conta? <a href="#" id="show-login">Entrar</a></p>
+        </div>
+    </div>
+</div>
+
+<script src="auth.js">
+
+    // Alternar entre login e cadastro
+    document.getElementById("show-register").addEventListener("click", () => {
+    document.getElementById("login-area").style.display = "none";
+    document.getElementById("register-area").style.display = "block";
+    });
+
+    document.getElementById("show-login").addEventListener("click", () => {
+    document.getElementById("register-area").style.display = "none";
+    document.getElementById("login-area").style.display = "block";
+    });
+
+    // Login
+    document.getElementById("login-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const email = document.getElementById("login-email").value;
+    const senha = document.getElementById("login-senha").value;
+
+    const user = localStorage.getItem(email);
+    if (user && JSON.parse(user).senha === senha) {
+    localStorage.setItem("usuarioLogado", email);
+    window.location.href = "forum.html";
+    } else {
+    alert("Email ou senha inválidos. Cadastre-se para acessar.");
+    }
+    });
+
+    // Cadastro
+    document.getElementById("register-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const nome = document.getElementById("register-nome").value;
+    const email = document.getElementById("register-email").value;
+    const senha = document.getElementById("register-senha").value;
+
+    localStorage.setItem(email, JSON.stringify({ nome, senha }));
+    alert("Conta criada com sucesso para " + nome + "!");
+    document.getElementById("register-area").style.display = "none";
+    document.getElementById("login-area").style.display = "block";
+    });
+
+</script>
+
+</body>
+</html>
+
