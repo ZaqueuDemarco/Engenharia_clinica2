@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Player VS - Multitracks</title>
+    <link rel="stylesheet" href="Style.css">
+    <link rel="stylesheet" href="vs.css">
+</head>
+<body>
+
+<header>
+    <h1>Player VS</h1>
+    <p>Carregue suas multitracks e toque com controle total de cada faixa.</p>
+    <nav>
+        <a href="index.html">Início</a>
+    </nav>
+</header>
+
+<main class="vs-main">
+
+    <aside class="vs-sidebar">
+        <h2>Minhas VS</h2>
+        <button id="btn-nova-vs">+ Nova VS</button>
+        <input type="file" id="input-arquivos" multiple accept="audio/*" style="display:none">
+        <ul id="lista-vs"></ul>
+    </aside>
+
+    <section class="vs-player">
+
+        <div id="vs-vazio" class="vs-vazio">
+            <p>Selecione uma VS na lista ao lado ou crie uma nova para começar.</p>
+        </div>
+
+        <div id="vs-conteudo" class="vs-conteudo" style="display:none">
+
+            <div class="vs-titulo-row">
+                <h2 id="vs-nome-atual"></h2>
+                <button id="btn-excluir-vs" class="btn-perigo">Excluir VS</button>
+            </div>
+
+            <div class="drop-zone" id="drop-zone">
+                Arraste arquivos de áudio aqui ou
+                <label for="input-add-faixa" class="link-arquivo">clique para adicionar faixas</label>
+                <input type="file" id="input-add-faixa" multiple accept="audio/*" style="display:none">
+            </div>
+
+            <div id="lista-faixas" class="lista-faixas"></div>
+
+            <div class="transporte">
+                <button id="btn-play" title="Tocar / Pausar">▶</button>
+                <button id="btn-stop" title="Parar">⏹</button>
+                <span id="tempo-atual" class="tempo">00:00</span>
+                <input type="range" id="seek" min="0" max="100" value="0" step="0.1">
+                <span id="tempo-total" class="tempo">00:00</span>
+                <label class="master-vol">
+                    Master
+                    <input type="range" id="master-volume" min="0" max="1" step="0.01" value="1">
+                </label>
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<footer>
+    © 2026 Engenharia Clínica — Player VS para multitracks.
+</footer>
+
+<script src="vs.js"></script>
+</body>
+</html>
