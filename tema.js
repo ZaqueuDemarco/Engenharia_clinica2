@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('agente-tema', 'escuro');
         }
         atualizarBotao();
+        document.dispatchEvent(new CustomEvent('tema-alterado'));
     });
 
     atualizarBotao();

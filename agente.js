@@ -367,47 +367,132 @@ function gerarRelatorio() {
     renderizarGraficos(dadosGraficos);
 }
 
-// ---------- Gráficos ----------
+// ---------- Gráficos (desenhados em canvas, sem biblioteca externa) ----------
 
 const PALETA_GRAFICO = ['#0066cc', '#2e9e5b', '#e0a800', '#cc3333', '#7a3fbf', '#00a3a3', '#c2559b', '#5b6b7a'];
+const LARGURA_GRAFICO = 500;
+const ALTURA_GRAFICO = 300;
 let graficosPorColuna = new Map();
 
-function construirConfigGrafico(tipo, nome, entradas) {
-    const labels = entradas.map(e => e[0]);
-    const valores = entradas.map(e => e[1]);
-    const cores = labels.map((_, i) => PALETA_GRAFICO[i % PALETA_GRAFICO.length]);
+function corTema(variavel, alternativa) {
+    const valor = getComputedStyle(document.documentElement).getPropertyValue(variavel).trim();
+    return valor || alternativa;
+}
 
-    if (tipo === 'pie') {
-        return {
-            type: 'pie',
-            data: { labels, datasets: [{ data: valores, backgroundColor: cores }] },
-            options: { responsive: true, plugins: { legend: { position: 'right' } } }
-        };
-    }
-    return {
-        type: 'bar',
-        data: { labels, datasets: [{ label: nome, data: valores, backgroundColor: '#0066cc' }] },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+function prepararCanvas(canvas) {
+    const dpr = window.devicePixelRatio || 1;
+    canvas.style.width = LARGURA_GRAFICO + 'px';
+    canvas.style.height = ALTURA_GRAFICO + 'px';
+    canvas.width = LARGURA_GRAFICO * dpr;
+    canvas.height = ALTURA_GRAFICO * dpr;
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, LARGURA_GRAFICO, ALTURA_GRAFICO);
+    return ctx;
+}
+
+function desenharGraficoBarras(canvas, labels, valores) {
+    const ctx = prepararCanvas(canvas);
+    const corTexto = corTema('--texto', '#1a1a1a');
+    const corEixo = corTema('--borda-forte', '#ccc');
+
+    const margemEsq = 34, margemInf = 46, margemSup = 18, margemDir = 12;
+    const areaLargura = LARGURA_GRAFICO - margemEsq - margemDir;
+    const areaAltura = ALTURA_GRAFICO - margemSup - margemInf;
+    const max = Math.max(...valores, 1);
+    const larguraSlot = areaLargura / labels.length;
+
+    ctx.strokeStyle = corEixo;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(margemEsq, margemSup);
+    ctx.lineTo(margemEsq, ALTURA_GRAFICO - margemInf);
+    ctx.lineTo(LARGURA_GRAFICO - margemDir, ALTURA_GRAFICO - margemInf);
+    ctx.stroke();
+
+    ctx.font = '11px Arial';
+    labels.forEach((label, i) => {
+        const valor = valores[i];
+        const alturaBarra = (valor / max) * (areaAltura - 16);
+        const larguraBarra = Math.min(46, larguraSlot * 0.6);
+        const x = margemEsq + i * larguraSlot + (larguraSlot - larguraBarra) / 2;
+        const y = ALTURA_GRAFICO - margemInf - alturaBarra;
+
+        ctx.fillStyle = PALETA_GRAFICO[0];
+        ctx.fillRect(x, y, larguraBarra, alturaBarra);
+
+        ctx.fillStyle = corTexto;
+        ctx.textAlign = 'center';
+        ctx.fillText(String(valor), x + larguraBarra / 2, y - 5);
+
+        const rotulo = label.length > 10 ? label.slice(0, 9) + '…' : label;
+        ctx.save();
+        ctx.translate(x + larguraBarra / 2, ALTURA_GRAFICO - margemInf + 14);
+        if (labels.length > 5) {
+            ctx.rotate(-Math.PI / 5);
+            ctx.textAlign = 'right';
+        } else {
+            ctx.textAlign = 'center';
         }
-    };
+        ctx.fillText(rotulo, 0, 0);
+        ctx.restore();
+    });
+}
+
+function desenharGraficoPizza(canvas, labels, valores) {
+    const ctx = prepararCanvas(canvas);
+    const corTexto = corTema('--texto', '#1a1a1a');
+    const total = valores.reduce((a, b) => a + b, 0) || 1;
+    const cx = 130, cy = ALTURA_GRAFICO / 2, raio = 95;
+    let anguloInicial = -Math.PI / 2;
+
+    valores.forEach((valor, i) => {
+        const fatia = (valor / total) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, raio, anguloInicial, anguloInicial + fatia);
+        ctx.closePath();
+        ctx.fillStyle = PALETA_GRAFICO[i % PALETA_GRAFICO.length];
+        ctx.fill();
+        anguloInicial += fatia;
+    });
+
+    ctx.font = '12px Arial';
+    ctx.textAlign = 'left';
+    let legendaY = 30;
+    labels.forEach((label, i) => {
+        const rotulo = label.length > 16 ? label.slice(0, 15) + '…' : label;
+        const pct = Math.round((valores[i] / total) * 100);
+        ctx.fillStyle = PALETA_GRAFICO[i % PALETA_GRAFICO.length];
+        ctx.fillRect(270, legendaY - 10, 12, 12);
+        ctx.fillStyle = corTexto;
+        ctx.fillText(`${rotulo} (${pct}%)`, 288, legendaY);
+        legendaY += 20;
+    });
+}
+
+function desenharGrafico(idx) {
+    const info = graficosPorColuna.get(idx);
+    if (!info) return;
+    const canvas = document.getElementById(`grafico-${idx}`);
+    if (!canvas) return;
+    const labels = info.entradas.map(e => e[0]);
+    const valores = info.entradas.map(e => e[1]);
+    if (info.tipo === 'pie') desenharGraficoPizza(canvas, labels, valores);
+    else desenharGraficoBarras(canvas, labels, valores);
 }
 
 function renderizarGraficos(dadosGraficos) {
-    graficosPorColuna.forEach(info => info.chart.destroy());
     graficosPorColuna = new Map();
-
-    if (typeof Chart === 'undefined') return;
-
     dadosGraficos.forEach(({ idx, nome, entradas }) => {
-        const canvas = document.getElementById(`grafico-${idx}`);
-        if (!canvas) return;
-        const chart = new Chart(canvas, construirConfigGrafico('bar', nome, entradas));
-        graficosPorColuna.set(idx, { chart, nome, entradas });
+        graficosPorColuna.set(idx, { nome, entradas, tipo: 'bar' });
+        desenharGrafico(idx);
     });
 }
+
+document.addEventListener('tema-alterado', () => {
+    graficosPorColuna.forEach((_, idx) => desenharGrafico(idx));
+});
 
 document.getElementById('conteudo-relatorio').addEventListener('change', e => {
     const select = e.target.closest('.tipo-grafico');
@@ -415,9 +500,8 @@ document.getElementById('conteudo-relatorio').addEventListener('change', e => {
     const idx = Number(select.dataset.col);
     const info = graficosPorColuna.get(idx);
     if (!info) return;
-    info.chart.destroy();
-    const canvas = document.getElementById(`grafico-${idx}`);
-    info.chart = new Chart(canvas, construirConfigGrafico(select.value, info.nome, info.entradas));
+    info.tipo = select.value;
+    desenharGrafico(idx);
 });
 
 document.getElementById('conteudo-relatorio').addEventListener('click', e => {
