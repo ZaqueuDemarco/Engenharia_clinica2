@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Agente Virtual de Gestão</title>
+    <link rel="stylesheet" href="agente.css">
+</head>
+<body>
+
+<header>
+    <h1>🤖 Agente Virtual de Gestão</h1>
+    <p>Cole seus dados e deixe o assistente organizar planilhas e gerar relatórios.</p>
+    <nav>
+        <a href="index.html">Início</a>
+        <a href="manuais.html">Manuais</a>
+        <a href="forum.html">Fórum</a>
+    </nav>
+</header>
+
+<main>
+
+    <section class="painel-entrada">
+        <h2>1. Cole os dados</h2>
+        <p class="dica">
+            Cole aqui dados copiados do Excel/Google Sheets, ou uma lista separada por ponto e vírgula, vírgula ou tabulação.
+            Exemplo: <code>Equipamento; Fabricante; Setor; Última Manutenção; Próxima Manutenção; Status</code>
+        </p>
+
+        <textarea id="entrada-dados" placeholder="Cole aqui os dados copiados da sua planilha ou digite manualmente, uma linha por registro..."></textarea>
+
+        <div class="opcoes-entrada">
+            <label><input type="checkbox" id="tem-cabecalho" checked> A primeira linha contém os títulos das colunas</label>
+        </div>
+
+        <div class="acoes">
+            <button id="btn-processar" class="btn-primario">✨ Processar dados</button>
+            <button id="btn-exemplo" class="btn-secundario">Ver exemplo</button>
+            <button id="btn-limpar" class="btn-secundario">Limpar tudo</button>
+        </div>
+    </section>
+
+    <section class="painel-planilha" id="painel-planilha" hidden>
+        <h2>2. Sua planilha</h2>
+
+        <div class="barra-ferramentas">
+            <input type="text" id="pesquisa-tabela" placeholder="🔍 Pesquisar na planilha...">
+
+            <button id="btn-add-linha">➕ Linha</button>
+            <button id="btn-add-coluna">➕ Coluna</button>
+
+            <label class="ordenar-label">
+                Ordenar por:
+                <select id="select-ordenar"></select>
+            </label>
+            <button id="btn-ordenar-asc">▲</button>
+            <button id="btn-ordenar-desc">▼</button>
+        </div>
+
+        <div class="tabela-container">
+            <table id="tabela-dados" class="tabela-editavel"></table>
+        </div>
+
+        <div class="acoes">
+            <button id="btn-relatorio" class="btn-primario">📊 Gerar relatório</button>
+            <button id="btn-csv" class="btn-secundario">⬇️ Exportar CSV</button>
+            <button id="btn-xlsx" class="btn-secundario">⬇️ Exportar Excel (.xlsx)</button>
+            <button id="btn-imprimir" class="btn-secundario">🖨️ Imprimir / PDF</button>
+        </div>
+    </section>
+
+    <section class="painel-relatorio" id="painel-relatorio" hidden>
+        <h2>3. Relatório e resumo</h2>
+        <div id="conteudo-relatorio"></div>
+    </section>
+
+</main>
+
+<footer class="rodape">
+    <p>© Engenharia Clínica – 2026 · Agente Virtual (100% local, seus dados não saem do navegador)</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="agente.js"></script>
+</body>
+</html>
