@@ -371,9 +371,8 @@ button {
     border-radius: 8px;
     padding: 14px;
     max-width: 560px;
+    overflow-x: auto;
 }
-
-.canvas-wrap canvas { max-height: 320px; }
 
 .rodape {
     margin-top: auto;
