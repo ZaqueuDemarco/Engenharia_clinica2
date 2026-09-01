@@ -5,16 +5,54 @@ html, body {
     margin: 0;
 }
 
+:root {
+    --bg: #f2f5f9;
+    --texto: #1a1a1a;
+    --texto-suave: #555;
+    --cartao-bg: #ffffff;
+    --azul-escuro: #003366;
+    --azul: #0055aa;
+    --azul-claro: #e6ecf5;
+    --dica-bg: #f4f8ff;
+    --borda: #e0e6ef;
+    --borda-forte: #ddd;
+    --hover-linha: #f4f8ff;
+    --sombra: rgba(0,0,0,0.1);
+    --foco-bg: #fffceb;
+    --btn-secundario-bg: #e6ecf5;
+    --btn-secundario-hover: #d3e0f5;
+}
+
+[data-tema="escuro"] {
+    --bg: #10161f;
+    --texto: #e8edf5;
+    --texto-suave: #aab8c8;
+    --cartao-bg: #1b2532;
+    --azul-escuro: #7fb3ff;
+    --azul: #4d94ff;
+    --azul-claro: #263444;
+    --dica-bg: #1e2a38;
+    --borda: #2c3a4a;
+    --borda-forte: #33424f;
+    --hover-linha: #22303f;
+    --sombra: rgba(0,0,0,0.4);
+    --foco-bg: #2b2a17;
+    --btn-secundario-bg: #263444;
+    --btn-secundario-hover: #314257;
+}
+
 body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
     font-family: Arial, Helvetica, sans-serif;
-    background: #f2f5f9;
-    color: #1a1a1a;
+    background: var(--bg);
+    color: var(--texto);
+    transition: background-color 0.2s, color 0.2s;
 }
 
 header {
+    position: relative;
     text-align: center;
     padding: 30px 20px;
     background: rgba(0, 51, 102, 0.95);
@@ -26,16 +64,27 @@ header h1 { margin: 0; font-size: 28px; }
 
 header p { margin-top: 8px; font-size: 15px; opacity: 0.9; }
 
-header nav { margin-top: 14px; }
+header nav { margin-top: 14px; display: flex; align-items: center; justify-content: center; gap: 14px; }
 
 header nav a {
     color: #ffdd00;
-    margin: 0 10px;
     text-decoration: none;
     font-weight: bold;
 }
 
 header nav a:hover { text-decoration: underline; }
+
+.btn-tema {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.btn-tema:hover { background: rgba(255,255,255,0.3); }
 
 main {
     flex: 1;
@@ -46,34 +95,40 @@ main {
 }
 
 section {
-    background: #ffffff;
+    background: var(--cartao-bg);
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 20px var(--sombra);
     padding: 25px 30px;
     margin-bottom: 30px;
+    transition: background-color 0.2s;
 }
 
 section h2 {
-    color: #003366;
+    color: var(--azul-escuro);
     margin-top: 0;
-    border-bottom: 2px solid #e6ecf5;
+    border-bottom: 2px solid var(--azul-claro);
     padding-bottom: 10px;
 }
 
 .dica {
-    background: #f4f8ff;
-    border-left: 4px solid #0055aa;
+    background: var(--dica-bg);
+    border-left: 4px solid var(--azul);
     padding: 10px 14px;
     border-radius: 6px;
     font-size: 14px;
-    color: #333;
+    color: var(--texto);
 }
 
 .dica code {
-    background: #e6ecf5;
+    background: var(--azul-claro);
     padding: 2px 6px;
     border-radius: 4px;
     font-size: 13px;
+}
+
+.dica-aviso {
+    margin-top: 10px;
+    border-left-color: #e0a800;
 }
 
 #entrada-dados {
@@ -81,16 +136,18 @@ section h2 {
     min-height: 160px;
     margin-top: 15px;
     padding: 14px;
-    border: 2px solid #003366;
+    border: 2px solid var(--azul-escuro);
     border-radius: 8px;
     font-size: 14px;
     font-family: "Courier New", monospace;
     resize: vertical;
+    background: var(--cartao-bg);
+    color: var(--texto);
 }
 
 #entrada-dados:focus {
     outline: none;
-    border-color: #0055aa;
+    border-color: var(--azul);
     box-shadow: 0 0 8px rgba(0, 85, 170, 0.3);
 }
 
@@ -117,18 +174,18 @@ button {
 }
 
 .btn-primario {
-    background: #003366;
+    background: var(--azul-escuro);
     color: white;
 }
 
-.btn-primario:hover { background: #0055aa; }
+.btn-primario:hover { background: var(--azul); }
 
 .btn-secundario {
-    background: #e6ecf5;
-    color: #003366;
+    background: var(--btn-secundario-bg);
+    color: var(--azul-escuro);
 }
 
-.btn-secundario:hover { background: #d3e0f5; }
+.btn-secundario:hover { background: var(--btn-secundario-hover); }
 
 .barra-ferramentas {
     display: flex;
@@ -141,9 +198,11 @@ button {
 .barra-ferramentas input,
 .barra-ferramentas select {
     padding: 9px 12px;
-    border: 2px solid #003366;
+    border: 2px solid var(--azul-escuro);
     border-radius: 6px;
     font-size: 14px;
+    background: var(--cartao-bg);
+    color: var(--texto);
 }
 
 .barra-ferramentas button {
@@ -166,22 +225,23 @@ button {
 .tabela-container {
     max-height: 480px;
     overflow: auto;
-    border: 1px solid #ddd;
+    border: 1px solid var(--borda-forte);
     border-radius: 8px;
 }
 
 .tabela-editavel {
     width: 100%;
     border-collapse: collapse;
-    background: white;
+    background: var(--cartao-bg);
 }
 
 .tabela-editavel th, .tabela-editavel td {
-    border: 1px solid #e0e6ef;
+    border: 1px solid var(--borda);
     padding: 10px 12px;
     font-size: 14px;
     text-align: left;
     min-width: 110px;
+    color: var(--texto);
 }
 
 .tabela-editavel thead th {
@@ -195,10 +255,11 @@ button {
 .tabela-editavel td[contenteditable="true"]:focus,
 .tabela-editavel th[contenteditable="true"]:focus {
     outline: 2px solid #ffdd00;
-    background: #fffceb;
+    background: var(--foco-bg);
+    color: #1a1a1a;
 }
 
-.tabela-editavel tbody tr:hover { background: #f4f8ff; }
+.tabela-editavel tbody tr:hover { background: var(--hover-linha); }
 
 .tabela-editavel .col-acoes {
     width: 36px;
@@ -227,22 +288,22 @@ button {
 .card {
     flex: 1;
     min-width: 160px;
-    background: #f4f8ff;
+    background: var(--dica-bg);
     border-radius: 10px;
     padding: 16px;
     text-align: center;
-    border: 1px solid #dde7fb;
+    border: 1px solid var(--borda);
 }
 
 .card .valor {
     font-size: 28px;
     font-weight: bold;
-    color: #003366;
+    color: var(--azul-escuro);
 }
 
 .card .rotulo {
     font-size: 13px;
-    color: #555;
+    color: var(--texto-suave);
     margin-top: 4px;
 }
 
@@ -251,31 +312,9 @@ button {
 }
 
 .bloco-relatorio h3 {
-    color: #003366;
+    color: var(--azul-escuro);
     font-size: 17px;
     margin-bottom: 10px;
-}
-
-.barra-distribuicao {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 6px 0;
-    font-size: 14px;
-}
-
-.barra-distribuicao .rotulo-item {
-    width: 200px;
-    flex-shrink: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.barra-distribuicao .barra {
-    height: 14px;
-    background: #0066cc;
-    border-radius: 4px;
 }
 
 .alerta {
@@ -289,6 +328,53 @@ button {
 .alerta.atencao { background: #fff8e1; border-left: 4px solid #e0a800; color: #6b5200; }
 .alerta.ok { background: #eafaf0; border-left: 4px solid #2e9e5b; color: #1c6b3b; }
 
+/* Gráficos */
+.bloco-grafico .cabecalho-grafico {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.bloco-grafico .cabecalho-grafico h3 { margin: 0; }
+
+.controles-grafico {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.controles-grafico select {
+    padding: 6px 10px;
+    border: 2px solid var(--azul-escuro);
+    border-radius: 6px;
+    font-size: 13px;
+    background: var(--cartao-bg);
+    color: var(--texto);
+}
+
+.btn-baixar-grafico {
+    background: var(--btn-secundario-bg);
+    color: var(--azul-escuro);
+    padding: 6px 12px;
+    font-size: 13px;
+    border-radius: 6px;
+}
+
+.btn-baixar-grafico:hover { background: var(--btn-secundario-hover); }
+
+.canvas-wrap {
+    background: var(--cartao-bg);
+    border: 1px solid var(--borda);
+    border-radius: 8px;
+    padding: 14px;
+    max-width: 560px;
+}
+
+.canvas-wrap canvas { max-height: 320px; }
+
 .rodape {
     margin-top: auto;
     text-align: center;
@@ -299,11 +385,11 @@ button {
 }
 
 @media print {
-    header nav, .painel-entrada, .barra-ferramentas, .acoes { display: none !important; }
+    header nav, .painel-entrada, .barra-ferramentas, .acoes, .controles-grafico { display: none !important; }
     section { box-shadow: none; border: 1px solid #ccc; }
-    body { background: white; }
+    body { background: white; color: #1a1a1a; }
 }
 
 @media (max-width: 700px) {
-    .barra-distribuicao .rotulo-item { width: 110px; }
+    .canvas-wrap { max-width: 100%; }
 }

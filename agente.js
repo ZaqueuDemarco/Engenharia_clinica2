@@ -218,6 +218,24 @@ function adicionarColuna() {
     atualizarSelectOrdenar();
 }
 
+function restaurarCabecalhoComoLinha() {
+    const tabela = document.getElementById('tabela-dados');
+    const theadRow = tabela.querySelector('thead tr');
+    const tbody = tabela.querySelector('tbody');
+    if (!theadRow || !tbody) return;
+
+    const valoresCabecalho = cabecalhos.slice();
+    cabecalhos = cabecalhos.map((_, idx) => `Coluna ${idx + 1}`);
+
+    const ths = theadRow.querySelectorAll('th[contenteditable="true"]');
+    ths.forEach((th, idx) => { th.textContent = cabecalhos[idx]; });
+
+    const novaLinha = construirLinhaDados(valoresCabecalho);
+    tbody.insertBefore(novaLinha, tbody.firstChild);
+
+    atualizarSelectOrdenar();
+}
+
 function filtrarTabela(termo) {
     const filtro = termo.toLowerCase();
     document.querySelectorAll('#tabela-dados tbody tr').forEach(tr => {
@@ -304,6 +322,7 @@ function gerarRelatorio() {
 
     // Distribuição de colunas categóricas (ex: status, fabricante, setor)
     const colunasCategoricas = analiseColunas.filter(c => c.ehCategorico);
+    const dadosGraficos = [];
     colunasCategoricas.forEach(col => {
         const contagem = {};
         col.valores.forEach(v => {
@@ -311,19 +330,22 @@ function gerarRelatorio() {
             contagem[chave] = (contagem[chave] || 0) + 1;
         });
         const entradas = Object.entries(contagem).sort((a, b) => b[1] - a[1]);
-        const max = entradas[0][1];
+        dadosGraficos.push({ idx: col.idx, nome: col.nome, entradas });
 
-        let bloco = `<div class="bloco-relatorio"><h3>Distribuição por "${col.nome}"</h3>`;
-        entradas.forEach(([chave, qtd]) => {
-            const largura = Math.max(4, Math.round((qtd / max) * 100));
-            bloco += `
-                <div class="barra-distribuicao">
-                    <span class="rotulo-item">${chave}</span>
-                    <div class="barra" style="width:${largura}%"></div>
-                    <span>${qtd}</span>
-                </div>`;
-        });
-        bloco += '</div>';
+        let bloco = `
+            <div class="bloco-relatorio bloco-grafico">
+                <div class="cabecalho-grafico">
+                    <h3>Distribuição por "${col.nome}"</h3>
+                    <div class="controles-grafico">
+                        <select class="tipo-grafico" data-col="${col.idx}">
+                            <option value="bar">Barras</option>
+                            <option value="pie">Pizza</option>
+                        </select>
+                        <button class="btn-baixar-grafico" data-col="${col.idx}" type="button">⬇️ PNG</button>
+                    </div>
+                </div>
+                <div class="canvas-wrap"><canvas id="grafico-${col.idx}"></canvas></div>
+            </div>`;
         html.push(bloco);
     });
 
@@ -341,7 +363,78 @@ function gerarRelatorio() {
     document.getElementById('conteudo-relatorio').innerHTML = html.join('');
     document.getElementById('painel-relatorio').hidden = false;
     document.getElementById('painel-relatorio').scrollIntoView({ behavior: 'smooth' });
+
+    renderizarGraficos(dadosGraficos);
 }
+
+// ---------- Gráficos ----------
+
+const PALETA_GRAFICO = ['#0066cc', '#2e9e5b', '#e0a800', '#cc3333', '#7a3fbf', '#00a3a3', '#c2559b', '#5b6b7a'];
+let graficosPorColuna = new Map();
+
+function construirConfigGrafico(tipo, nome, entradas) {
+    const labels = entradas.map(e => e[0]);
+    const valores = entradas.map(e => e[1]);
+    const cores = labels.map((_, i) => PALETA_GRAFICO[i % PALETA_GRAFICO.length]);
+
+    if (tipo === 'pie') {
+        return {
+            type: 'pie',
+            data: { labels, datasets: [{ data: valores, backgroundColor: cores }] },
+            options: { responsive: true, plugins: { legend: { position: 'right' } } }
+        };
+    }
+    return {
+        type: 'bar',
+        data: { labels, datasets: [{ label: nome, data: valores, backgroundColor: '#0066cc' }] },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+    };
+}
+
+function renderizarGraficos(dadosGraficos) {
+    graficosPorColuna.forEach(info => info.chart.destroy());
+    graficosPorColuna = new Map();
+
+    if (typeof Chart === 'undefined') return;
+
+    dadosGraficos.forEach(({ idx, nome, entradas }) => {
+        const canvas = document.getElementById(`grafico-${idx}`);
+        if (!canvas) return;
+        const chart = new Chart(canvas, construirConfigGrafico('bar', nome, entradas));
+        graficosPorColuna.set(idx, { chart, nome, entradas });
+    });
+}
+
+document.getElementById('conteudo-relatorio').addEventListener('change', e => {
+    const select = e.target.closest('.tipo-grafico');
+    if (!select) return;
+    const idx = Number(select.dataset.col);
+    const info = graficosPorColuna.get(idx);
+    if (!info) return;
+    info.chart.destroy();
+    const canvas = document.getElementById(`grafico-${idx}`);
+    info.chart = new Chart(canvas, construirConfigGrafico(select.value, info.nome, info.entradas));
+});
+
+document.getElementById('conteudo-relatorio').addEventListener('click', e => {
+    const btn = e.target.closest('.btn-baixar-grafico');
+    if (!btn) return;
+    const idx = Number(btn.dataset.col);
+    const canvas = document.getElementById(`grafico-${idx}`);
+    const info = graficosPorColuna.get(idx);
+    if (!canvas || !info) return;
+
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = `grafico-${info.nome.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.png`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+});
 
 // ---------- Exportação ----------
 
@@ -406,6 +499,7 @@ document.getElementById('btn-limpar').addEventListener('click', () => {
 
 document.getElementById('btn-add-linha').addEventListener('click', adicionarLinha);
 document.getElementById('btn-add-coluna').addEventListener('click', adicionarColuna);
+document.getElementById('btn-restaurar-cabecalho').addEventListener('click', restaurarCabecalhoComoLinha);
 document.getElementById('btn-ordenar-asc').addEventListener('click', () => ordenarTabela('asc'));
 document.getElementById('btn-ordenar-desc').addEventListener('click', () => ordenarTabela('desc'));
 document.getElementById('pesquisa-tabela').addEventListener('keyup', e => filtrarTabela(e.target.value));

@@ -5,12 +5,19 @@
     <meta charset="UTF-8">
     <title>Portal de Engenharia Clínica</title>
     <link rel="stylesheet" href="Style.css">
+    <script>
+        (function () {
+            var tema = localStorage.getItem('agente-tema') || 'escuro';
+            if (tema === 'escuro') document.documentElement.setAttribute('data-tema', 'escuro');
+        })();
+    </script>
 </head>
 <body>
 
 <header>
     <h1>Portal de Engenharia Clínica</h1>
     <p>Agente virtual para gestão de planilhas e relatórios.</p>
+    <button id="btn-tema" class="btn-tema" title="Alternar tema">☀️</button>
 </header>
 
 <main>
@@ -30,5 +37,6 @@
     © 2026 Engenharia Clínica — Portal técnico independente.
 </footer>
 
+<script src="tema.js"></script>
 </body>
 </html>
