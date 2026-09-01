@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <title>Agente Virtual de Gestão</title>
     <link rel="stylesheet" href="agente.css">
+    <script>
+        (function () {
+            var tema = localStorage.getItem('agente-tema') || 'escuro';
+            if (tema === 'escuro') document.documentElement.setAttribute('data-tema', 'escuro');
+        })();
+    </script>
 </head>
 <body>
 
@@ -12,6 +18,7 @@
     <p>Cole seus dados e deixe o assistente organizar planilhas e gerar relatórios.</p>
     <nav>
         <a href="index.html">Início</a>
+        <button id="btn-tema" class="btn-tema" title="Alternar tema">☀️</button>
     </nav>
 </header>
 
@@ -29,6 +36,9 @@
         <div class="opcoes-entrada">
             <label><input type="checkbox" id="tem-cabecalho" checked> A primeira linha contém os títulos das colunas</label>
         </div>
+        <p class="dica dica-aviso">
+            ⚠️ Se a caixa acima estiver marcada mas seus dados <strong>não</strong> tiverem uma linha de título, o primeiro registro vira cabeçalho da tabela (fica destacado em azul) e não é contado no relatório. Se isso acontecer, use o botão <strong>"↩️ 1ª linha é dado"</strong> na barra de ferramentas da planilha para corrigir.
+        </p>
 
         <div class="acoes">
             <button id="btn-processar" class="btn-primario">✨ Processar dados</button>
@@ -45,6 +55,7 @@
 
             <button id="btn-add-linha">➕ Linha</button>
             <button id="btn-add-coluna">➕ Coluna</button>
+            <button id="btn-restaurar-cabecalho" title="Clique se a primeira linha da tabela (destacada em azul) for na verdade um registro, e não um título de coluna">↩️ 1ª linha é dado</button>
 
             <label class="ordenar-label">
                 Ordenar por:
@@ -78,6 +89,8 @@
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="tema.js"></script>
 <script src="agente.js"></script>
 </body>
 </html>
