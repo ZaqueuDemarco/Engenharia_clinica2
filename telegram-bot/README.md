@@ -16,7 +16,43 @@ sem servidor próprio pra manter.
 
 1. Crie uma conta em https://dash.cloudflare.com/sign-up (não precisa cartão para o plano gratuito de Workers).
 
-## 3. Instalar e configurar
+## Publicando pelo navegador, sem terminal (celular/iPad)
+
+Se você não tem acesso a um computador com terminal, dá pra fazer tudo pelo
+site da Cloudflare, usando o arquivo **`worker-standalone.js`** (é o mesmo
+bot, só que em um único arquivo, pronto pra colar):
+
+1. Em https://dash.cloudflare.com, no menu à esquerda vá em **Workers & Pages**
+   → **Create** (ou o botão "Create an app" que você já encontrou).
+2. Escolha **"Start with Hello World!"**, dê um nome ao Worker (ex.:
+   `agente-virtual-bot`) e clique em **Deploy** — isso cria um worker de
+   exemplo, que vamos substituir a seguir.
+3. Depois de criado, clique em **"Edit code"** (ou o ícone de lápis/editor).
+4. Apague todo o conteúdo do arquivo que abrir e cole no lugar todo o
+   conteúdo de `telegram-bot/worker-standalone.js` (abra esse arquivo no
+   GitHub, use o botão de copiar o conteúdo bruto/"Raw", e cole no editor
+   da Cloudflare).
+5. Clique em **Save and deploy** (ou "Deploy").
+6. Vá em **Settings** → **Variables and Secrets** (dentro do seu Worker) →
+   **Add** duas variáveis, marcando o tipo como **Secret** (não "Text",
+   pra não ficar visível):
+   - `TELEGRAM_BOT_TOKEN` → cole o token que o @BotFather te deu
+   - `TELEGRAM_WEBHOOK_SECRET` → invente uma senha aleatória qualquer
+   Salve.
+7. Na aba principal do Worker, copie a URL dele (algo como
+   `https://agente-virtual-bot.SEU-USUARIO.workers.dev`).
+8. Abra uma nova aba no Safari e visite esta URL, trocando `<TOKEN>`,
+   `<URL_DO_WORKER>` e `<SEGREDO>` pelos seus valores reais (a URL toda vai
+   na barra de endereço, sem espaços):
+
+   ```
+   https://api.telegram.org/bot<TOKEN>/setWebhook?url=<URL_DO_WORKER>&secret_token=<SEGREDO>
+   ```
+
+   Deve aparecer `{"ok":true,"result":true,...}` na tela.
+9. Pronto — pule para o passo **6. Testar** mais abaixo.
+
+## 3. Instalar e configurar (alternativa, se você tiver um computador com terminal)
 
 Dentro da pasta `telegram-bot/`:
 
