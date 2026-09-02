@@ -1,0 +1,7 @@
+name = "agente-virtual-telegram-bot"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+
+# Segredos (NÃO coloque valores reais aqui — defina com `wrangler secret put`):
+#   TELEGRAM_BOT_TOKEN     — token do @BotFather
+#   TELEGRAM_WEBHOOK_SECRET — string aleatória sua, para validar que a chamada veio do Telegram
